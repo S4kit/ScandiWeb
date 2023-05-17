@@ -1,4 +1,5 @@
 <?php
+//Could use .htaccess too
 $request = $_SERVER['REQUEST_URI'];
 switch ($request) {
     case '/':
