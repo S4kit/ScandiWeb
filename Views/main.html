@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<script>
+    const url = '/API/api.php';
+    let click = false;
+    let toDeleteArray = [];
+    function getData() {
+        fetch(url)
+            .then(response => response.json())
+            .then(result => {
+                result.forEach(product => {
+                    const container = document.getElementById('addC');
+
+                    // Create a card element
+                    const card = document.createElement('card');
+                    card.classList.add('card');
+
+                    switch (product.type) {
+                        case 'DVD': card.innerHTML = `
+                    <input type="checkbox"   class="delete-checkbox" data="${product.id}"  disabled>
+                     <div class="card-content">
+                        <h2>${product.sku}</h2>
+                        <p>${product.name}</p>
+                        <p>${product.price}$</p>
+                        <p>Size: ${product.size}</p>
+                     </div>                    
+               `;
+                            break;
+                        case 'Furniture': card.innerHTML = `
+                    <input type="checkbox"  class="delete-checkbox" data="${product.id}"  disabled>
+                     <div class="card-content">
+                        <h2>${product.sku}</h2>
+                        <p>${product.name}</p>
+                        <p>${product.price}$</p>
+                        <p>Dimension: ${product.dimension}</p>
+                     </div>                    
+               `;
+                            break;
+                        case 'Book': card.innerHTML = `
+                        <input type="checkbox"  class="delete-checkbox" data="${product.id}" disabled>
+                     <div class="card-content">
+                        <h2>${product.sku}</h2>
+                        <p>${product.name}</p>
+                        <p>${product.price}$</p>
+                        <p>Weight: ${product.weight}</p>
+                     </div>                    
+               `;
+                            break;
+                    }
+
+
+                    // Append the card to the container
+                    container.appendChild(card);
+                });
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    }
+    function toDelete() {
+        const checkboxes = document.querySelectorAll('.delete-checkbox');
+        const checkBox = document.getElementsByClassName('delete-checkbox');
+        const massDeleteButton = document.getElementById('delete-product-btn');
+        if (click) {
+            fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(toDeleteArray) // Convert the array to JSON and send it as the request body
+            })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload(true);
+                    } else {
+                        console.error('Error deleting array:', response.statusText);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+
+
+        } else {
+
+
+            for (let i = 0; i < checkBox.length; i++) {
+                checkBox[i].disabled = false;
+            }
+
+            checkboxes.forEach(function (checkbox) {
+
+
+                checkbox.addEventListener('change', function () {
+                    if (checkbox.checked) {
+                        toDeleteArray.push(checkbox.getAttribute('data'));
+                    } else {
+                        const index = toDeleteArray.indexOf(checkbox.getAttribute('data'));
+                        if (index !== -1) {
+                            toDeleteArray.splice(index, 1);
+                        }
+                    }
+                });
+
+            });
+            click = !click;
+        }
+
+    }
+    document.addEventListener('DOMContentLoaded', getData);
+</script>
+
+<head>
+    <title>Product List</title>
+    <link rel="stylesheet" type="text/css" href="/Views/styles.css">
+</head>
+
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <h1>Product List</h1>
+            </div>
+            <div class="buttons">
+                <a href="/add-product"><button id="addButton">ADD</button></a>
+                <button id="delete-product-btn" onclick="toDelete()">MASS DELETE</button>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="product-cards" id="addC">
+
+
+        </div>
+    </div>
+    <footer>
+        <p>ScandiWeb Test assignment</p>
+    </footer>
+</body>
+
+</html>

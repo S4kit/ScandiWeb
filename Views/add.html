@@ -1,0 +1,138 @@
+<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="/Views/styles.css">
+    <link rel="stylesheet" type="text/css" href="/Views/form.css">
+
+    <title>Product Add</title>
+</head>
+<script>
+    function addData() {
+        const url = 'API/api.php';
+        sku_value = document.getElementById('sku').value;
+        name_value = document.getElementById('name').value;
+        price_value = document.getElementById('price').value;
+        type_value = document.getElementById('productType').value;
+        switch (type_value) {
+            case 'DVD': attribute_value = document.getElementById('size').value;
+                break;
+            case 'Book': attribute_value = document.getElementById('weight').value;
+                break;
+            case 'Furniture':
+                height = document.getElementById('height').value;
+                width = document.getElementById('width').value;
+                length = document.getElementById('length').value;
+                attribute_value = `${height}x${width}x${length}`
+                break;
+        }
+        const product = {
+            sku: sku_value,
+            name: name_value,
+            price: price_value,
+            type: type_value,
+            attribute: attribute_value
+        };
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(product)
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response from the server
+                console.log('Added product:', data);
+            })
+            .catch(error => {
+                console.error('Error adding product:', error);
+            });
+
+    }
+</script>
+
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <h1>Product Add</h1>
+            </div>
+            <div class="buttons">
+                <a href="/"> <button id="addButton" onclick="addData()">Save</button></a>
+                <a href="/"> <button class="Cancel">Cancel</button></a>
+            </div>
+        </nav>
+    </header>
+    <h1><br /></h1>
+    <form id="product_form">
+        <label for="sku">SKU:</label>
+        <input type="text" id="sku" name="sku" required><br>
+
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br>
+
+        <label for="price">Price($):</label>
+        <input type="number" id="price" name="price" step="0.01" oninput="validateNumberInput(this)" required><br>
+        <br /><br /><br />
+        <label for="productType">Product Type:</label>
+        <select id="productType" name="productType">
+            <option value="" disabled selected>Select an item</option>
+            <option value="DVD">DVD</option>
+            <option value="Book">Book</option>
+            <option value="Furniture">Furniture</option>
+        </select><br>
+
+        <div id="typeSpecificAttribute">
+
+        </div>
+
+    </form>
+
+    <script>
+        function validateNumberInput(input) {
+            let value = input.value;
+
+            value = value.replace(/[^0-9]/g, '');
+
+            input.value = value;
+        }
+
+        const productTypeSelect = document.getElementById('productType');
+        const typeSpecificAttribute = document.getElementById('typeSpecificAttribute');
+
+        productTypeSelect.addEventListener('change', function () {
+            const selectedType = this.value;
+
+            typeSpecificAttribute.innerHTML = '';
+
+            if (selectedType === 'DVD') {
+                typeSpecificAttribute.innerHTML = `
+                    <label for="size">Size (MB):</label>
+                    <input type="number" id="size" name="size" step="0.01" oninput="validateNumberInput(this)" required><br>
+                `;
+            } else if (selectedType === 'Book') {
+                typeSpecificAttribute.innerHTML = `
+                    <label for="weight">Weight (KG):</label>
+                    <input type="number" id="weight" name="weight" oninput="validateNumberInput(this)" step="0.01" required><br>
+                `;
+            } else if (selectedType === 'Furniture') {
+                typeSpecificAttribute.innerHTML = `
+                    <label for="height">Height(CM):</label>
+                    <input type="number" id="height" name="height" oninput="validateNumberInput(this)" step="0.01" required><br>
+
+                    <label for="width">Width(CM):</label>
+                    <input type="number" id="width" name="width" oninput="validateNumberInput(this)" step="0.01" required><br>
+
+                    <label for="length">Length(CM):</label>
+                    <input type="number" id="length" name="length" oninput="validateNumberInput(this)" step="0.01" required><br>
+                `;
+            }
+        });
+    </script>
+    <footer>
+        <p>ScandiWeb Test assignment</p>
+    </footer>
+</body>
+
+</html>
