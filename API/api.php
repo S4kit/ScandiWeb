@@ -4,8 +4,11 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: *");
 header("Access-Control-Allow-Methods: *");
 header('Content-Type: application/json');
+$db = new DatabaseConnection('localhost', 'root', 'root', 'scandiweb');
+$db->connect();
 
-$restAPI = new ProductController();
+$restAPI = new ProductController($db);
+
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -22,9 +25,9 @@ switch ($method) {
         $recievedJSon = file_get_contents("php://input");
         $decode = json_decode($recievedJSon, true);
 
-        $product = new Product($decode['sku'], $decode['name'], $decode['price'], $decode['type']);
+        $product = new Product($decode['sku'], $decode['name'], $decode['price'], $decode['type'], $decode['attribute']);
 
-        $response = $restAPI->saveProduct($product, $decode['attribute']);
+        $response = $restAPI->saveProduct($product);
         if ($response != true) {
             http_response_code(500); // Internal Server Error
         }

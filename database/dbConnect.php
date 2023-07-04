@@ -1,21 +1,40 @@
 <?php
-class Db
+
+class DatabaseConnection
 {
-    protected $con = null;
+    private $host;
+    private $username;
+    private $password;
+    private $database;
+    private $connection;
 
-
-    public function __construct()
+    public function __construct($host, $username, $password, $database)
     {
-        $host = "localhost";
-        $user = "root";
-        $password = "root";
-        $dbname = "scandiweb";
-        $this->con = mysqli_connect($host, $user, $password, $dbname);
-        if (!$this->con) {
-            die("Connection failed: " . mysqli_connect_error());
+        $this->host = $host;
+        $this->username = $username;
+        $this->password = $password;
+        $this->database = $database;
+    }
+
+    public function connect()
+    {
+        $this->connection = new mysqli($this->host, $this->username, $this->password, $this->database);
+
+        if ($this->connection->connect_errno) {
+            die("Failed to connect to MySQL: " . $this->connection->connect_error);
         }
     }
 
+    public function executeQuery($query)
+    {
+        $result = $this->connection->query($query);
+
+        if (!$result) {
+            die("Query execution failed: " . $this->connection->error);
+        }
+
+        return $result;
+    }
 }
 
 ?>

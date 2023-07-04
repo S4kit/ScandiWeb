@@ -8,48 +8,22 @@
         fetch(url)
             .then(response => response.json())
             .then(result => {
+                result = JSON.parse(result);
                 result.forEach(product => {
                     const container = document.getElementById('addC');
 
                     // Create a card element
                     const card = document.createElement('card');
                     card.classList.add('card');
-
-                    switch (product.type) {
-                        case 'DVD': card.innerHTML = `
+                    card.innerHTML = `
                     <input type="checkbox"   class="delete-checkbox" data="${product.id}"  disabled>
                      <div class="card-content">
                         <h2>${product.sku}</h2>
                         <p>${product.name}</p>
                         <p>${product.price}$</p>
-                        <p>Size: ${product.size}</p>
+                        <p>Size: ${product.attribute}</p>
                      </div>                    
                `;
-                            break;
-                        case 'Furniture': card.innerHTML = `
-                    <input type="checkbox"  class="delete-checkbox" data="${product.id}"  disabled>
-                     <div class="card-content">
-                        <h2>${product.sku}</h2>
-                        <p>${product.name}</p>
-                        <p>${product.price}$</p>
-                        <p>Dimension: ${product.dimension}</p>
-                     </div>                    
-               `;
-                            break;
-                        case 'Book': card.innerHTML = `
-                        <input type="checkbox"  class="delete-checkbox" data="${product.id}" disabled>
-                     <div class="card-content">
-                        <h2>${product.sku}</h2>
-                        <p>${product.name}</p>
-                        <p>${product.price}$</p>
-                        <p>Weight: ${product.weight}</p>
-                     </div>                    
-               `;
-                            break;
-                    }
-
-
-                    // Append the card to the container
                     container.appendChild(card);
                 });
             })

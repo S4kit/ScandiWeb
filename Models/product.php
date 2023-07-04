@@ -7,17 +7,24 @@ class Product
     protected $name;
     protected $price;
     protected $type;
-    public function __construct($sku, $name, $price, $type)
+    protected $attribute;
+
+    public function __construct($sku, $name, $price, $type, $attribute)
     {
         $this->sku = $sku;
         $this->name = $name;
         $this->price = $price;
         $this->type = $type;
+        $this->attribute = $attribute;
     }
 
     public function getID()
     {
         return $this->id;
+    }
+    public function getAttribute()
+    {
+        return $this->attribute;
     }
 
     public function getSKU()
@@ -57,6 +64,11 @@ class Product
     {
         $this->type = $type;
     }
+    public function setAttribute($attribute)
+    {
+        $this->attribute = $attribute;
+    }
+
 
 
 }
