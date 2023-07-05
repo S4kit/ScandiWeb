@@ -2,28 +2,28 @@
 <html>
 <script>
     const url = '/API/api.php';
-    let click = false;
-    let toDeleteArray = [];
+    var toDeleteArray = [];
+
+    document.addEventListener('DOMContentLoaded', getData);
+
     function getData() {
         fetch(url)
             .then(response => response.json())
             .then(result => {
-                result = JSON.parse(result);
+                result = JSON.parse(result)
                 result.forEach(product => {
                     const container = document.getElementById('addC');
-
-                    // Create a card element
-                    const card = document.createElement('card');
+                    const card = document.createElement('div');
                     card.classList.add('card');
                     card.innerHTML = `
-                    <input type="checkbox"   class="delete-checkbox" data="${product.id}"  disabled>
-                     <div class="card-content">
-                        <h2>${product.sku}</h2>
-                        <p>${product.name}</p>
-                        <p>${product.price}$</p>
-                        <p>Size: ${product.attribute}</p>
-                     </div>                    
-               `;
+                  <input type="checkbox" class="delete-checkbox" data="${product.id}">
+                  <div class="card-content">
+                    <h2>${product.sku}</h2>
+                    <p>${product.name}</p>
+                    <p>${product.price}$</p>
+                    <p>Size: ${product.attribute}</p>
+                  </div>                    
+                `;
                     container.appendChild(card);
                 });
             })
@@ -31,57 +31,39 @@
                 console.error(error);
             });
     }
-    function toDelete() {
-        const checkboxes = document.querySelectorAll('.delete-checkbox');
-        const checkBox = document.getElementsByClassName('delete-checkbox');
-        const massDeleteButton = document.getElementById('delete-product-btn');
-        if (click) {
-            fetch(url, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(toDeleteArray) // Convert the array to JSON and send it as the request body
-            })
-                .then(response => {
-                    if (response.ok) {
-                        window.location.reload(true);
-                    } else {
-                        console.error('Error deleting array:', response.statusText);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
 
-
-        } else {
-
-
-            for (let i = 0; i < checkBox.length; i++) {
-                checkBox[i].disabled = false;
-            }
-
-            checkboxes.forEach(function (checkbox) {
-
-
-                checkbox.addEventListener('change', function () {
-                    if (checkbox.checked) {
-                        toDeleteArray.push(checkbox.getAttribute('data'));
-                    } else {
-                        const index = toDeleteArray.indexOf(checkbox.getAttribute('data'));
-                        if (index !== -1) {
-                            toDeleteArray.splice(index, 1);
-                        }
-                    }
-                });
-
-            });
-            click = !click;
-        }
-
+    function getCheckBoxes(className) {
+        const checkboxes = document.querySelectorAll(`input[type="checkbox"].${className}:checked`);
+        const checkboxValues = Array.from(checkboxes).map(checkbox => checkbox.getAttribute('data'));
+        return checkboxValues;
     }
-    document.addEventListener('DOMContentLoaded', getData);
+    function toDelete() {
+        toDeleteArray = getCheckBoxes('delete-checkbox');
+        console.log(toDeleteArray)
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                operation: 'delete',
+                items: toDeleteArray
+            })
+        })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload(true);
+                } else {
+                    console.error('Error deleting array:', response.statusText);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+
 </script>
 
 <head>
